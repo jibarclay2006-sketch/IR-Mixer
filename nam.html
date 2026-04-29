@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NAM Web Amp Tester | DualCab IR Mixer</title>
+  <meta name="description" content="Experimental Neural Amp Modeler WebAssembly page for testing .nam models with IRs in the browser.">
+  <link rel="stylesheet" href="nam.css">
+  <link rel="stylesheet" href="https://esm.sh/neural-amp-modeler-wasm@1.0.8/dist/styles.css">
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="hero-top">
+        <div>
+          <p class="eyebrow">Experimental NAM WebAssembly page</p>
+          <h1>NAM Amp Tester</h1>
+        </div>
+        <a class="back" href="./index.html">Back to IR Mixer</a>
+      </div>
+      <p>
+        This page uses the open-source Neural Amp Modeler WebAssembly player from TONE3000.
+        It can load a NAM amp model, a cab IR, and a dry guitar input so you can test IRs through a real NAM-style model instead of the simple built-in amp sim.
+      </p>
+      <p>
+        For best results, use a short dry DI guitar clip and a normal mono cab IR. The normal mixer page is still the one that renders and downloads your blended IR file.
+      </p>
+    </section>
+
+    <section class="setup">
+      <article class="card">
+        <h2>1. NAM model</h2>
+        <label class="file">
+          <strong id="modelName">Use demo AC10 model or load .nam</strong>
+          <span>Click to load a local .nam model</span>
+          <input id="modelFile" type="file" accept=".nam,application/octet-stream">
+        </label>
+        <div><span class="pill">.nam</span><span class="pill">amp / pedal capture</span></div>
+      </article>
+
+      <article class="card">
+        <h2>2. Cab IR</h2>
+        <label class="file">
+          <strong id="irName">Use demo Celestion IR or load WAV</strong>
+          <span>Click to load a local .wav cab IR</span>
+          <input id="irFile" type="file" accept="audio/wav,audio/x-wav,audio/wave,.wav">
+        </label>
+        <div><span class="pill">WAV IR</span><span class="pill">cabinet / mic</span></div>
+      </article>
+
+      <article class="card">
+        <h2>3. Dry guitar</h2>
+        <label class="file">
+          <strong id="inputName">Use demo guitar or load DI</strong>
+          <span>Click to load a local dry guitar file</span>
+          <input id="inputFile" type="file" accept="audio/*,.wav,.mp3,.m4a,.aac,.flac,.ogg">
+        </label>
+        <div><span class="pill">DI recommended</span><span class="pill">audio input</span></div>
+      </article>
+    </section>
+
+    <section class="card warning">
+      <h2>Important</h2>
+      <p>
+        This is an experimental page. It relies on a WebAssembly package loaded from a CDN, so it needs internet access and may take a little longer to start.
+        If it does not load on GitHub Pages, the original IR mixer still works locally without NAM.
+      </p>
+      <div class="actions"><button id="resetDemo" type="button">Reset to Demo Files</button></div>
+    </section>
+
+    <section class="player-wrap">
+      <div id="nam-root" class="fallback">
+        <strong>Loading NAM WebAssembly player...</strong><br>
+        If this stays here, your browser may be blocking the CDN module, or the WASM package may not be available from the current network.
+      </div>
+    </section>
+
+    <section class="tips">
+      <article class="card">
+        <h2>How this fits the IR mixer</h2>
+        <ul>
+          <li>Use this page to hear how an IR sounds through an actual NAM model.</li>
+          <li>Use the main mixer page to blend two IRs and download the mixed IR.</li>
+          <li>After downloading the mixed IR, load that WAV here as the cab IR.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h2>Good test workflow</h2>
+        <ul>
+          <li>Pick a NAM model close to your normal amp tone.</li>
+          <li>Load a dry DI riff that has palm mutes, chords, and single notes.</li>
+          <li>Compare IR blends at the same output level so louder does not automatically seem better.</li>
+        </ul>
+      </article>
+    </section>
+  </main>
+
+  <script type="module">
+    import React, { useMemo, useState } from 'https://esm.sh/react@18.2.0';
+    import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client';
+    import { T3kPlayer, T3kPlayerProvider } from 'https://esm.sh/neural-amp-modeler-wasm@1.0.8';
+
+    const DEMO = {
+      models: [
+        {
+          name: 'Demo Vox AC10',
+          url: 'https://raw.githubusercontent.com/tone-3000/neural-amp-modeler-wasm/refs/heads/main/ui/public/models/ac10.nam',
+          default: true
+        },
+        {
+          name: 'Demo Deluxe Reverb',
+          url: 'https://raw.githubusercontent.com/tone-3000/neural-amp-modeler-wasm/refs/heads/main/ui/public/models/deluxe.nam'
+        }
+      ],
+      irs: [
+        {
+          name: 'Demo Celestion Cab IR',
+          url: 'https://raw.githubusercontent.com/tone-3000/neural-amp-modeler-wasm/refs/heads/main/ui/public/irs/celestion.wav',
+          default: true
+        },
+        { name: 'No cab IR', url: '', mix: 0 }
+      ],
+      inputs: [
+        {
+          name: 'Demo Mayer Guitar DI',
+          url: 'https://raw.githubusercontent.com/tone-3000/neural-amp-modeler-wasm/refs/heads/main/ui/public/inputs/Mayer%20-%20Guitar.wav',
+          default: true
+        },
+        {
+          name: 'Demo Bass DI',
+          url: 'https://raw.githubusercontent.com/tone-3000/neural-amp-modeler-wasm/refs/heads/main/ui/public/inputs/Downtown%20-%20Bass.wav'
+        }
+      ]
+    };
+
+    function makeObjectUrl(file) {
+      return file ? URL.createObjectURL(file) : null;
+    }
+
+    function NamApp() {
+      const [modelFile, setModelFile] = useState(null);
+      const [irFile, setIrFile] = useState(null);
+      const [inputFile, setInputFile] = useState(null);
+
+      window.__setNamFiles = { setModelFile, setIrFile, setInputFile };
+
+      const modelUrl = useMemo(() => makeObjectUrl(modelFile), [modelFile]);
+      const irUrl = useMemo(() => makeObjectUrl(irFile), [irFile]);
+      const inputUrl = useMemo(() => makeObjectUrl(inputFile), [inputFile]);
+
+      const models = modelFile && modelUrl
+        ? [{ name: modelFile.name, url: modelUrl, default: true }, ...DEMO.models]
+        : DEMO.models;
+      const irs = irFile && irUrl
+        ? [{ name: irFile.name, url: irUrl, default: true }, ...DEMO.irs]
+        : DEMO.irs;
+      const inputs = inputFile && inputUrl
+        ? [{ name: inputFile.name, url: inputUrl, default: true }, ...DEMO.inputs]
+        : DEMO.inputs;
+
+      return React.createElement(
+        T3kPlayerProvider,
+        null,
+        React.createElement(T3kPlayer, { models, irs, inputs })
+      );
+    }
+
+    const root = createRoot(document.getElementById('nam-root'));
+    root.render(React.createElement(NamApp));
+
+    const byId = id => document.getElementById(id);
+    byId('modelFile').addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      byId('modelName').textContent = file.name;
+      window.__setNamFiles.setModelFile(file);
+    });
+    byId('irFile').addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      byId('irName').textContent = file.name;
+      window.__setNamFiles.setIrFile(file);
+    });
+    byId('inputFile').addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      byId('inputName').textContent = file.name;
+      window.__setNamFiles.setInputFile(file);
+    });
+    byId('resetDemo').addEventListener('click', () => {
+      byId('modelFile').value = '';
+      byId('irFile').value = '';
+      byId('inputFile').value = '';
+      byId('modelName').textContent = 'Use demo AC10 model or load .nam';
+      byId('irName').textContent = 'Use demo Celestion IR or load WAV';
+      byId('inputName').textContent = 'Use demo guitar or load DI';
+      window.__setNamFiles.setModelFile(null);
+      window.__setNamFiles.setIrFile(null);
+      window.__setNamFiles.setInputFile(null);
+    });
+  </script>
+</body>
+</html>
