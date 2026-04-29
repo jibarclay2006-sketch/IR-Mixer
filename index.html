@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DualCab IR Mixer</title>
+  <meta name="description" content="A browser-based guitar cabinet impulse response mixer and WAV exporter." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="shell">
+    <header class="brand-bar">
+      <div>
+        <p class="eyebrow">Stiltone-style web utility</p>
+        <h1>DualCab IR Mixer</h1>
+      </div>
+      <div class="badge">IR Loader • Mixer • WAV Export</div>
+    </header>
+
+    <section class="processor" aria-label="Dual cabinet impulse response mixer">
+      <div class="rack-top">
+        <article class="channel" id="channel-a">
+          <div class="channel-head"><h2>Cab A</h2><label class="small-switch"><input type="checkbox" id="soloA" /> Solo</label><label class="small-switch"><input type="checkbox" id="muteA" /> Mute</label></div>
+          <label class="file-picker"><span class="file-path" id="fileNameA">Load first IR .wav</span><input id="fileA" type="file" accept="audio/wav,audio/x-wav,audio/wave,.wav" /></label>
+          <div class="file-list" id="detailsA"><span>Supported: mono or stereo WAV IRs.</span><span>Nothing leaves your browser.</span></div>
+          <div class="mini-actions"><button class="secondary" id="clearA" type="button">Clear</button><label class="small-switch"><input type="checkbox" id="invertA" /> Ø invert</label></div>
+        </article>
+
+        <div class="center-stack">
+          <div class="readout" id="balanceReadout">50 / 50</div>
+          <label class="knob-control tall"><input id="balance" type="range" min="-100" max="100" value="0" step="1" /><span class="knob"></span><span class="label">Balance</span></label>
+          <div class="readout" id="roomReadout">5%</div>
+          <label class="knob-control tall"><input id="room" type="range" min="0" max="35" value="5" step="1" /><span class="knob"></span><span class="label">Room</span></label>
+        </div>
+
+        <article class="channel" id="channel-b">
+          <div class="channel-head"><h2>Cab B</h2><label class="small-switch"><input type="checkbox" id="soloB" /> Solo</label><label class="small-switch"><input type="checkbox" id="muteB" /> Mute</label></div>
+          <label class="file-picker"><span class="file-path" id="fileNameB">Load second IR .wav</span><input id="fileB" type="file" accept="audio/wav,audio/x-wav,audio/wave,.wav" /></label>
+          <div class="file-list" id="detailsB"><span>Blend two mics, two cabs, or two positions.</span><span>Export the finished mix as a WAV IR.</span></div>
+          <div class="mini-actions"><button class="secondary" id="clearB" type="button">Clear</button><label class="small-switch"><input type="checkbox" id="invertB" /> Ø invert</label></div>
+        </article>
+      </div>
+
+      <div class="gain-row" aria-label="Channel gain faders">
+        <label class="fader-control"><span class="readout" id="gainAReadout">0.0 dB</span><input id="gainA" type="range" min="-24" max="12" value="0" step="0.1" /><span>Cab A Gain</span></label>
+        <label class="fader-control"><span class="readout" id="gainBReadout">0.0 dB</span><input id="gainB" type="range" min="-24" max="12" value="0" step="0.1" /><span>Cab B Gain</span></label>
+      </div>
+
+      <div class="controls-grid" aria-label="Tone and timing controls">
+        <div class="control-bank"><h3>Cab A shaping</h3><div class="knob-grid">
+          <label class="knob-control"><span class="readout" id="hpAReadout">50 Hz</span><input id="hpA" type="range" min="20" max="500" value="50" step="1" /><span class="knob"></span><span class="label">Hi Pass</span></label>
+          <label class="knob-control"><span class="readout" id="lpAReadout">16.0 kHz</span><input id="lpA" type="range" min="4000" max="20000" value="16000" step="100" /><span class="knob"></span><span class="label">Lo Pass</span></label>
+          <label class="knob-control"><span class="readout" id="resAReadout">0.0 dB</span><input id="resA" type="range" min="-12" max="12" value="0" step="0.1" /><span class="knob"></span><span class="label">Resonance</span></label>
+          <label class="knob-control"><span class="readout" id="delayAReadout">0 ms</span><input id="delayA" type="range" min="0" max="20" value="0" step="0.1" /><span class="knob"></span><span class="label">Delay</span></label>
+          <label class="knob-control"><span class="readout" id="panAReadout">100% L</span><input id="panA" type="range" min="-100" max="100" value="-100" step="1" /><span class="knob"></span><span class="label">Panning</span></label>
+        </div></div>
+        <div class="control-bank"><h3>Cab B shaping</h3><div class="knob-grid">
+          <label class="knob-control"><span class="readout" id="panBReadout">100% R</span><input id="panB" type="range" min="-100" max="100" value="100" step="1" /><span class="knob"></span><span class="label">Panning</span></label>
+          <label class="knob-control"><span class="readout" id="delayBReadout">0 ms</span><input id="delayB" type="range" min="0" max="20" value="0" step="0.1" /><span class="knob"></span><span class="label">Delay</span></label>
+          <label class="knob-control"><span class="readout" id="resBReadout">0.0 dB</span><input id="resB" type="range" min="-12" max="12" value="0" step="0.1" /><span class="knob"></span><span class="label">Resonance</span></label>
+          <label class="knob-control"><span class="readout" id="lpBReadout">12.0 kHz</span><input id="lpB" type="range" min="4000" max="20000" value="12000" step="100" /><span class="knob"></span><span class="label">Lo Pass</span></label>
+          <label class="knob-control"><span class="readout" id="hpBReadout">80 Hz</span><input id="hpB" type="range" min="20" max="500" value="80" step="1" /><span class="knob"></span><span class="label">Hi Pass</span></label>
+        </div></div>
+      </div>
+    </section>
+
+    <section class="output-panel">
+      <div class="options">
+        <label>Output<select id="outputMode"><option value="stereo" selected>Stereo WAV</option><option value="mono">Mono WAV</option></select></label>
+        <label>Sample rate<select id="sampleRate"><option value="44100">44.1 kHz</option><option value="48000" selected>48 kHz</option><option value="96000">96 kHz</option></select></label>
+        <label>Bit depth<select id="bitDepth"><option value="16">16-bit PCM</option><option value="24" selected>24-bit PCM</option><option value="32f">32-bit float</option></select></label>
+        <label class="small-switch"><input id="normalize" type="checkbox" checked /> Normalize</label>
+      </div>
+      <div class="wave-card"><div class="wave-head"><h2>Rendered IR</h2><p id="status">Load one or two WAV impulse responses to start.</p></div><canvas id="waveform" width="1200" height="260" aria-label="Rendered IR waveform"></canvas></div>
+      <div class="button-row"><button id="renderBtn" type="button">Mix / Render IR</button><button id="previewBtn" class="secondary" type="button" disabled>Audition Ping</button><button id="downloadBtn" type="button" disabled>Download Mixed IR</button></div>
+    </section>
+
+    <section class="notes"><h2>What the controls do</h2><p><strong>Resonance</strong> is implemented as a presence-style peaking filter centered around the upper guitar-cab range. Positive values add bite and forwardness; negative values smooth the IR. The <strong>Room</strong> knob adds tiny early reflections to make a close-mic IR feel less dry. For a totally raw blend, set Room and Resonance to zero.</p><p>This app runs fully in the browser with the Web Audio API. Your IR files are decoded locally and are not uploaded anywhere.</p></section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
