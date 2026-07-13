@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="theme-color" content="#0f1320">
+  <meta name="color-scheme" content="dark">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="HiChord">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icon.svg">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <title>HiChord</title>
+  <link rel="stylesheet" href="./v5.css">
+</head>
+<body>
+  <div id="viewport">
+    <div id="stageWrap">
+      <div id="stage">
+        <main class="device" aria-label="HiChord playable instrument">
+          <section class="left">
+            <div class="brand">HiChord</div>
+            <div class="speaker" aria-hidden="true"></div>
+            <div class="leftBottom">
+              <div class="joystickArea" id="joyArea" aria-label="Chord modifier joystick">
+                <div class="joyDots"></div>
+                <div class="joystick" id="joyStick"></div>
+              </div>
+              <div class="leftControls">
+                <button class="soundButton" id="soundBtn" aria-label="Change sound">WARM</button>
+                <label class="volumeBox">VOL <input id="volume" type="range" min="0" max="1" value=".68" step=".01"></label>
+              </div>
+            </div>
+          </section>
+
+          <section class="right">
+            <div class="topbar">
+              <div class="display" id="display">C</div>
+              <button class="topbtn key" id="keyBtn" aria-label="Change key">⌕</button>
+              <button class="topbtn strum" id="strumBtn" aria-label="Toggle strum">∿</button>
+              <button class="topbtn hold" id="holdBtn" aria-label="Toggle hold">◷</button>
+            </div>
+            <div class="padWell">
+              <div class="pads">
+                <button class="pad p2" data-degree="1">2</button>
+                <button class="pad p4" data-degree="3">4</button>
+                <button class="pad p6" data-degree="5">6</button>
+                <button class="pad p1" data-degree="0">1</button>
+                <button class="pad p3" data-degree="2">3</button>
+                <button class="pad p5" data-degree="4">5</button>
+                <button class="pad p7" data-degree="6">7</button>
+              </div>
+            </div>
+          </section>
+          <div class="status"><b id="statusChord">C</b> · <span id="statusMod">Base</span> · <span id="statusSound">Warm</span></div>
+          <button class="installButton" id="installBtn" aria-label="Install app">⇩</button>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="startCard"><div class="appIcon">H</div><h1>HiChord</h1><p>Rotate sideways, tap a chord pad, and move the joystick to reshape it.</p><button class="startButton" id="startBtn">Tap to Play</button></div>
+  </div>
+  <div class="installHelp" id="installHelp"><div class="helpCard"><h2>Add HiChord to your iPhone</h2><ol><li>Open this page in <b>Safari</b>.</li><li>Tap the <b>Share</b> button.</li><li>Choose <b>Add to Home Screen</b>.</li><li>Open HiChord from the new icon.</li></ol><button id="closeHelp">Done</button></div></div>
+  <div class="rotate"><div><span class="phone">▯</span><h2>Rotate your iPhone</h2><p>HiChord is designed for landscape.</p></div></div>
+  <input class="iosHaptic" id="iosHaptic" type="checkbox" switch aria-hidden="true" tabindex="-1">
+
+<script src="./v5.js"></script>
+</body>
+</html>
