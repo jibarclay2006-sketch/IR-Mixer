@@ -241,7 +241,6 @@ joyArea.addEventListener('touchstart',e=>{
   joyTouchId=t.identifier;orphanedJoy=false;joyStick.classList.add('dragging');
   haptic('selection');updateJoy(t.clientX,t.clientY);e.preventDefault();
 },{passive:false});
-jooyArea=undefined;
 joyArea.addEventListener('touchmove',e=>{
   const t=Array.from(e.touches).find(t=>t.identifier===joyTouchId);
   if(t){updateJoy(t.clientX,t.clientY);e.preventDefault()}
